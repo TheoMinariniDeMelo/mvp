@@ -1,6 +1,27 @@
 import { CommercialService } from './commercial.service';
 
 describe('CommercialService', () => {
+  it('ignora dados locais incompletos e restaura o catálogo inicial', () => {
+    vi.stubGlobal('localStorage', { getItem: () => JSON.stringify({ products: null, cart: [] }) });
+    try {
+      const service = new CommercialService();
+      expect(service.products()).toHaveLength(5);
+      expect(service.total()).toBe(77.3);
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
+
+  it('ignora produto salvo com campos inválidos', () => {
+    vi.stubGlobal('localStorage', { getItem: () => JSON.stringify({ products: [{}], cart: [], lastSale: null, movements: [] }) });
+    try {
+      const service = new CommercialService();
+      expect(service.products()[0].name).toBe('Arroz 5 kg');
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
+
   it('rejeita preço que seria arredondado para zero', () => {
     const service = new CommercialService();
     expect(service.addProduct({ name: 'Teste', category: 'Outros', price: 0.001, stock: 1 })).toBeTruthy();
