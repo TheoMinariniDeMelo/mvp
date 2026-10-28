@@ -6,6 +6,11 @@ describe('CommercialService', () => {
     expect(service.addProduct({ name: 'Teste', category: 'Outros', price: 0.001, stock: 1 })).toBeTruthy();
   });
 
+  it('evita produtos duplicados mesmo com diferenças de maiúsculas', () => {
+    const service = new CommercialService();
+    expect(service.addProduct({ name: ' arroz 5 KG ', category: 'Mercearia', price: 10, stock: 1 })).toBe('Já existe um produto com esse nome.');
+  });
+
   it('calcula a venda de exemplo com precisão', () => {
     const service = new CommercialService();
     expect(service.cartItems().map(item => item.subtotal)).toEqual([51.8, 25.5]);

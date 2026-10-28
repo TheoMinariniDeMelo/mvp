@@ -54,6 +54,7 @@ export class CommercialService {
   clearCart(): void { this.cart.set([]); this.persist(); }
   addProduct(data: { name: string; category: string; price: number; stock: number }): string | null {
     if (!data.name.trim() || !data.category.trim() || !Number.isFinite(data.price) || data.price < 0.01 || !Number.isInteger(data.stock) || data.stock < 0) return 'Preencha os campos com nome, categoria, preço e estoque válidos.';
+    if (this.products().some(p => p.name.toLocaleLowerCase('pt-BR') === data.name.trim().toLocaleLowerCase('pt-BR'))) return 'Já existe um produto com esse nome.';
     const id = Math.max(0, ...this.products().map(p => p.id)) + 1;
     this.products.update(list => [...list, { id, name: data.name.trim(), category: data.category.trim(), price: this.round(data.price), stock: data.stock, minStock: 5, sku: `NOV-${String(id).padStart(3, '0')}` }]);
     this.persist(); return null;
