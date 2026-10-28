@@ -47,6 +47,13 @@ describe('CommercialService', () => {
     expect(service.products().find(p => p.id === 1)?.stock).toBe(1);
   });
 
+  it('rejeita linhas duplicadas para não registrar venda inconsistente', () => {
+    const service = new CommercialService();
+    service.cart.set([{ productId: 1, quantity: 2 }, { productId: 1, quantity: 2 }]);
+    expect(service.confirmSale().error).toBe('O carrinho contém produtos duplicados. Revise a venda.');
+    expect(service.available(1)).toBe(15);
+  });
+
   it('confirma a venda e atualiza o estoque sem saldo negativo', () => {
     const service = new CommercialService();
     const result = service.confirmSale();

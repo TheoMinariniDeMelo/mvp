@@ -63,6 +63,7 @@ export class CommercialService {
   confirmSale(): { sale?: Sale; error?: string } {
     const lines = this.cart();
     if (!lines.length) return { error: 'Adicione pelo menos um produto antes de confirmar a venda.' };
+    if (new Set(lines.map(line => line.productId)).size !== lines.length) return { error: 'O carrinho contém produtos duplicados. Revise a venda.' };
     if (lines.some(line => !Number.isInteger(line.quantity) || line.quantity < 1 || line.quantity > this.available(line.productId))) return { error: 'Estoque insuficiente. Verifique a quantidade selecionada.' };
     try {
       const now = new Date();
