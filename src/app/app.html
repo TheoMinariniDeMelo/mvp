@@ -1,0 +1,18 @@
+<div class="app-shell">
+  <aside class="sidebar" aria-label="Menu principal">
+    <a class="brand" routerLink="/dashboard" aria-label="Sistema Web de Gestão Comercial, início"><span class="brand-mark" aria-hidden="true">G</span><span class="brand-copy"><strong>Gestão Comercial</strong><small>Sistema de vendas</small></span></a>
+    <div class="sidebar-label">MENU PRINCIPAL</div>
+    <nav aria-label="Navegação principal">
+      <a routerLink="/dashboard" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}"><app-icon name="layout-dashboard" /> <span>Visão geral</span></a>
+      <a routerLink="/vendas/nova" routerLinkActive="active"><app-icon name="shopping-cart" /> <span>Registrar venda</span></a>
+      <a routerLink="/dashboard" [queryParams]="{painel:'produtos'}"><app-icon name="package" /> <span>Produtos</span></a>
+      <a routerLink="/dashboard" [queryParams]="{painel:'estoque'}"><app-icon name="boxes" /> <span>Consultar estoque</span></a>
+    </nav>
+    <div class="sidebar-bottom"><div class="help-card"><app-icon name="circle-help" /><div><strong>Precisa de ajuda?</strong><span>Protótipo demonstrativo</span></div></div><div class="sidebar-user"><span class="avatar">OD</span><div><strong>Operador Demo</strong><small>Funcionário</small></div></div></div>
+  </aside>
+  <div class="main-area">
+    <header class="topbar"><div class="topbar-title"><span class="mobile-brand">Gestão Comercial</span><span class="full-title">Sistema Web de Gestão Comercial</span></div><div class="topbar-actions"><span class="demo-pill"><span class="status-dot"></span> Ambiente de demonstração</span><div class="top-user"><span class="avatar">OD</span><span><strong>Operador Demo</strong><small>Funcionário</small></span></div><button class="logout" type="button" (click)="showExitMessage()"><app-icon name="log-out" /><span>Sair</span></button></div></header>
+    @if (exitMessage()) { <div class="exit-message" role="status"><app-icon name="info" /> {{ exitMessage() }} <button type="button" (click)="exitMessage.set('')" aria-label="Fechar aviso"><app-icon name="x" /></button></div> }
+    <main id="conteudo"><router-outlet /></main>
+  </div>
+</div>

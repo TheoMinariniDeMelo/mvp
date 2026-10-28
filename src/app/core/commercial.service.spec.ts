@@ -1,0 +1,44 @@
+import { CommercialService } from './commercial.service';
+
+describe('CommercialService', () => {
+  it('calcula a venda de exemplo com precisão', () => {
+    const service = new CommercialService();
+    expect(service.cartItems().map(item => item.subtotal)).toEqual([51.8, 25.5]);
+    expect(service.total()).toBe(77.3);
+  });
+
+  it('impede quantidades acima do estoque ao adicionar e confirmar', () => {
+    const service = new CommercialService();
+    expect(service.addToCart(1, 14)).toBe('Estoque insuficiente. Verifique a quantidade selecionada.');
+    expect(service.updateCart(1, 16)).toBe('Estoque insuficiente. Verifique a quantidade selecionada.');
+    expect(service.products().find(p => p.id === 1)?.stock).toBe(15);
+  });
+
+  it('permite adicionar, alterar e remover itens no carrinho', () => {
+    const service = new CommercialService();
+    expect(service.addToCart(3, 2)).toBeNull();
+    expect(service.total()).toBe(87.1);
+    expect(service.updateCart(3, 3)).toBeNull();
+    expect(service.total()).toBe(92);
+    service.removeFromCart(3);
+    expect(service.total()).toBe(77.3);
+  });
+
+  it('rejeita a confirmação se o estoque mudar antes da venda', () => {
+    const service = new CommercialService();
+    service.products.update(list => list.map(p => p.id === 1 ? { ...p, stock: 1 } : p));
+    expect(service.confirmSale().error).toBe('Estoque insuficiente. Verifique a quantidade selecionada.');
+    expect(service.products().find(p => p.id === 1)?.stock).toBe(1);
+  });
+
+  it('confirma a venda e atualiza o estoque sem saldo negativo', () => {
+    const service = new CommercialService();
+    const result = service.confirmSale();
+    expect(result.sale?.total).toBe(77.3);
+    expect(result.sale?.items.map(item => item.quantity)).toEqual([2, 3]);
+    expect(service.products().find(p => p.id === 1)?.stock).toBe(13);
+    expect(service.products().find(p => p.id === 2)?.stock).toBe(17);
+    expect(service.cart()).toEqual([]);
+    expect(service.movements()).toHaveLength(2);
+  });
+});
