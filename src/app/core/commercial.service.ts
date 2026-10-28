@@ -46,6 +46,7 @@ export class CommercialService {
   }
   updateCart(productId: number, quantity: number): string | null {
     if (!Number.isInteger(quantity) || quantity < 1) return 'A quantidade deve ser maior que zero. Use Remover para excluir o item.';
+    if (!this.cart().some(line => line.productId === productId)) return 'Produto não encontrado no carrinho.';
     if (quantity > this.available(productId)) return 'Estoque insuficiente. Verifique a quantidade selecionada.';
     this.cart.update(lines => lines.map(p => p.productId === productId ? { ...p, quantity } : p));
     this.persist(); return null;

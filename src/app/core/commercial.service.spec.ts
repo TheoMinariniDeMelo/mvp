@@ -34,6 +34,12 @@ describe('CommercialService', () => {
     expect(service.total()).toBe(77.3);
   });
 
+  it('não altera uma linha ausente do carrinho', () => {
+    const service = new CommercialService();
+    expect(service.updateCart(3, 2)).toBe('Produto não encontrado no carrinho.');
+    expect(service.inCart(3)).toBe(0);
+  });
+
   it('rejeita a confirmação se o estoque mudar antes da venda', () => {
     const service = new CommercialService();
     service.products.update(list => list.map(p => p.id === 1 ? { ...p, stock: 1 } : p));
