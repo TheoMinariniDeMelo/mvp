@@ -10,7 +10,10 @@ export class DashboardComponent {
   readonly store = inject(CommercialService);
   private readonly route = inject(ActivatedRoute);
   private readonly query = toSignal(this.route.queryParamMap);
-  readonly panel = computed(() => this.query()?.get('painel') ?? 'inicio');
+  readonly panel = computed(() => {
+    const requested = this.query()?.get('painel');
+    return requested === 'produtos' || requested === 'estoque' ? requested : 'inicio';
+  });
   readonly notice = signal('');
   readonly error = signal('');
   product = { name: '', category: 'Mercearia', price: null as number | null, stock: null as number | null };
