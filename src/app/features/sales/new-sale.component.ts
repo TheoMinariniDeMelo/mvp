@@ -13,7 +13,10 @@ export class NewSaleComponent {
   readonly errorProductId = signal<number | null>(null);
   readonly notice = signal('');
   readonly confirming = signal(false);
-  readonly filtered = computed(() => this.store.products().filter(p => p.name.toLocaleLowerCase('pt-BR').includes(this.search().trim().toLocaleLowerCase('pt-BR'))));
+  readonly filtered = computed(() => {
+    const term = this.search().trim().toLocaleLowerCase('pt-BR');
+    return this.store.products().filter(p => [p.name, p.sku, p.category].some(value => value.toLocaleLowerCase('pt-BR').includes(term)));
+  });
   quantity(id: number): number { return this.quantities()[id] ?? 1; }
   setQuantity(id: number, raw: string): void {
     const value = Number(raw);
