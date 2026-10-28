@@ -9,6 +9,48 @@ const INITIAL_PRODUCTS: Product[] = [
   { id: 5, name: 'Leite 1 L', category: 'Laticínios', price: 5.50, stock: 30, minStock: 5, sku: 'LAT-005' },
 ];
 const STORAGE_KEY = 'gestao-comercial-mvp-v1';
+type SavedState = { products: Product[]; cart: CartLine[]; lastSale: Sale | null; movements: StockMovement[] };
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+function isProduct(value: unknown): value is Product {
+  return isRecord(value) && Number.isSafeInteger(value['id']) && typeof value['name'] === 'string'
+    && typeof value['category'] === 'string' && typeof value['sku'] === 'string'
+    && typeof value['price'] === 'number' && Number.isFinite(value['price'])
+    && Number.isSafeInteger(value['stock']) && Number.isSafeInteger(value['minStock']);
+}
+
+function isCartLine(value: unknown): value is CartLine {
+  return isRecord(value) && Number.isSafeInteger(value['productId'])
+    && Number.isSafeInteger(value['quantity']) && (value['quantity'] as number) > 0;
+}
+
+function isSaleItem(value: unknown): value is SaleItem {
+  return isRecord(value) && Number.isSafeInteger(value['productId']) && typeof value['name'] === 'string'
+    && Number.isSafeInteger(value['quantity']) && typeof value['unitPrice'] === 'number'
+    && typeof value['subtotal'] === 'number' && Number.isFinite(value['unitPrice']) && Number.isFinite(value['subtotal']);
+}
+
+function isSale(value: unknown): value is Sale {
+  return isRecord(value) && typeof value['id'] === 'string' && typeof value['date'] === 'string'
+    && Array.isArray(value['items']) && value['items'].every(isSaleItem)
+    && typeof value['total'] === 'number' && Number.isFinite(value['total']);
+}
+
+function isMovement(value: unknown): value is StockMovement {
+  return isRecord(value) && Number.isSafeInteger(value['productId']) && Number.isSafeInteger(value['quantity'])
+    && (value['type'] === 'saida' || value['type'] === 'entrada') && typeof value['date'] === 'string'
+    && (value['saleId'] === undefined || typeof value['saleId'] === 'string');
+}
+
+function isSavedState(value: unknown): value is SavedState {
+  return isRecord(value) && Array.isArray(value['products']) && value['products'].every(isProduct)
+    && Array.isArray(value['cart']) && value['cart'].every(isCartLine)
+    && (value['lastSale'] === null || isSale(value['lastSale']))
+    && Array.isArray(value['movements']) && value['movements'].every(isMovement);
+}
 
 @Injectable({ providedIn: 'root' })
 export class CommercialService {
@@ -26,8 +68,13 @@ export class CommercialService {
   readonly lowStockCount = computed(() => this.products().filter(p => p.stock <= p.minStock).length);
 
   private round(value: number): number { return Math.round((value + Number.EPSILON) * 100) / 100; }
-  private readSaved(): { products: Product[]; cart: CartLine[]; lastSale: Sale | null; movements: StockMovement[] } | null {
-    try { const value = localStorage.getItem(STORAGE_KEY); return value ? JSON.parse(value) : null; } catch { return null; }
+  private readSaved(): SavedState | null {
+    try {
+      const value = localStorage.getItem(STORAGE_KEY);
+      if (!value) return null;
+      const parsed: unknown = JSON.parse(value);
+      return isSavedState(parsed) ? parsed : null;
+    } catch { return null; }
   }
   private persist(): void {
     try { localStorage.setItem(STORAGE_KEY, JSON.stringify({ products: this.products(), cart: this.cart(), lastSale: this.lastSale(), movements: this.movements() })); } catch { /* Demo remains functional without storage. */ }
