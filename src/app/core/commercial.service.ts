@@ -35,7 +35,7 @@ export class CommercialService {
   available(productId: number): number { return this.products().find(p => p.id === productId)?.stock ?? 0; }
   inCart(productId: number): number { return this.cart().find(p => p.productId === productId)?.quantity ?? 0; }
   addToCart(productId: number, quantity: number): string | null {
-    if (!Number.isInteger(quantity) || quantity < 1) return 'Informe uma quantidade válida.';
+    if (!Number.isSafeInteger(quantity) || quantity < 1) return 'Informe uma quantidade válida.';
     const product = this.products().find(p => p.id === productId);
     if (!product) return 'Produto não encontrado.';
     if (this.inCart(productId) + quantity > product.stock) return 'Estoque insuficiente. Verifique a quantidade selecionada.';
@@ -45,7 +45,7 @@ export class CommercialService {
     this.persist(); return null;
   }
   updateCart(productId: number, quantity: number): string | null {
-    if (!Number.isInteger(quantity) || quantity < 1) return 'A quantidade deve ser maior que zero. Use Remover para excluir o item.';
+    if (!Number.isSafeInteger(quantity) || quantity < 1) return 'A quantidade deve ser maior que zero. Use Remover para excluir o item.';
     if (!this.cart().some(line => line.productId === productId)) return 'Produto não encontrado no carrinho.';
     if (quantity > this.available(productId)) return 'Estoque insuficiente. Verifique a quantidade selecionada.';
     this.cart.update(lines => lines.map(p => p.productId === productId ? { ...p, quantity } : p));
@@ -54,7 +54,7 @@ export class CommercialService {
   removeFromCart(productId: number): void { this.cart.update(lines => lines.filter(p => p.productId !== productId)); this.persist(); }
   clearCart(): void { this.cart.set([]); this.persist(); }
   addProduct(data: { name: string; category: string; price: number; stock: number }): string | null {
-    if (!data.name.trim() || !data.category.trim() || !Number.isFinite(data.price) || data.price < 0.01 || !Number.isInteger(data.stock) || data.stock < 0) return 'Preencha os campos com nome, categoria, preço e estoque válidos.';
+    if (!data.name.trim() || !data.category.trim() || !Number.isFinite(data.price) || data.price < 0.01 || !Number.isSafeInteger(data.stock) || data.stock < 0) return 'Preencha os campos com nome, categoria, preço e estoque válidos.';
     if (this.products().some(p => p.name.toLocaleLowerCase('pt-BR') === data.name.trim().toLocaleLowerCase('pt-BR'))) return 'Já existe um produto com esse nome.';
     const id = Math.max(0, ...this.products().map(p => p.id)) + 1;
     this.products.update(list => [...list, { id, name: data.name.trim(), category: data.category.trim(), price: this.round(data.price), stock: data.stock, minStock: 5, sku: `NOV-${String(id).padStart(3, '0')}` }]);
@@ -64,7 +64,7 @@ export class CommercialService {
     const lines = this.cart();
     if (!lines.length) return { error: 'Adicione pelo menos um produto antes de confirmar a venda.' };
     if (new Set(lines.map(line => line.productId)).size !== lines.length) return { error: 'O carrinho contém produtos duplicados. Revise a venda.' };
-    if (lines.some(line => !Number.isInteger(line.quantity) || line.quantity < 1 || line.quantity > this.available(line.productId))) return { error: 'Estoque insuficiente. Verifique a quantidade selecionada.' };
+    if (lines.some(line => !Number.isSafeInteger(line.quantity) || line.quantity < 1 || line.quantity > this.available(line.productId))) return { error: 'Estoque insuficiente. Verifique a quantidade selecionada.' };
     try {
       const now = new Date();
       const sale: Sale = { id: `VEN-${String(now.getTime()).slice(-8)}`, date: now.toISOString(), items: this.cartItems(), total: this.total() };

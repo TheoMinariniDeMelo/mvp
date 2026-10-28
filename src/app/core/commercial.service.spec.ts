@@ -11,6 +11,12 @@ describe('CommercialService', () => {
     expect(service.addProduct({ name: ' arroz 5 KG ', category: 'Mercearia', price: 10, stock: 1 })).toBe('Já existe um produto com esse nome.');
   });
 
+  it('rejeita quantidades inteiras acima do limite seguro', () => {
+    const service = new CommercialService();
+    expect(service.addToCart(3, Number.MAX_SAFE_INTEGER + 1)).toBe('Informe uma quantidade válida.');
+    expect(service.addProduct({ name: 'Teste', category: 'Outros', price: 1, stock: Number.MAX_SAFE_INTEGER + 1 })).toBeTruthy();
+  });
+
   it('calcula a venda de exemplo com precisão', () => {
     const service = new CommercialService();
     expect(service.cartItems().map(item => item.subtotal)).toEqual([51.8, 25.5]);
