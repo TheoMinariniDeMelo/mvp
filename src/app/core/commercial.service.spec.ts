@@ -1,6 +1,11 @@
 import { CommercialService } from './commercial.service';
 
 describe('CommercialService', () => {
+  it('rejeita preço que seria arredondado para zero', () => {
+    const service = new CommercialService();
+    expect(service.addProduct({ name: 'Teste', category: 'Outros', price: 0.001, stock: 1 })).toBeTruthy();
+  });
+
   it('calcula a venda de exemplo com precisão', () => {
     const service = new CommercialService();
     expect(service.cartItems().map(item => item.subtotal)).toEqual([51.8, 25.5]);
