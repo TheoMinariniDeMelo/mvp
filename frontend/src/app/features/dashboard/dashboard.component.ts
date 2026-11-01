@@ -17,10 +17,10 @@ export class DashboardComponent {
   readonly notice = signal('');
   readonly error = signal('');
   product = { name: '', category: 'Mercearia', price: null as number | null, stock: null as number | null };
-  addProduct(): void {
+  async addProduct(): Promise<void> {
     this.error.set(''); this.notice.set('');
     if (this.product.stock === null) { this.error.set('Informe o estoque inicial do produto.'); return; }
-    const error = this.store.addProduct({ name: this.product.name, category: this.product.category, price: Number(this.product.price), stock: Number(this.product.stock) });
+    const error = await this.store.addProduct({ name: this.product.name, category: this.product.category, price: Number(this.product.price), stock: Number(this.product.stock) });
     if (error) { this.error.set(error); return; }
     this.notice.set('Produto cadastrado com sucesso. Ele já está disponível para venda.');
     this.product = { name: '', category: 'Mercearia', price: null, stock: null };

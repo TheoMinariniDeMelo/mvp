@@ -41,14 +41,12 @@ export class NewSaleComponent {
     if (error) this.error.set(error);
   }
   remove(id: number): void { this.store.removeFromCart(id); this.error.set(''); this.notice.set('Produto removido do resumo.'); }
-  confirm(): void {
+  async confirm(): Promise<void> {
     if (this.confirming()) return;
     this.error.set(''); this.notice.set(''); this.confirming.set(true);
-    setTimeout(() => {
-      const result = this.store.confirmSale(); this.confirming.set(false);
-      if (result.error) this.error.set(result.error);
-      else void this.router.navigateByUrl('/vendas/resultado');
-    }, 350);
+    const result = await this.store.confirmSale(); this.confirming.set(false);
+    if (result.error) this.error.set(result.error);
+    else void this.router.navigateByUrl('/vendas/resultado');
   }
   cancel(): void { this.store.clearCart(); void this.router.navigateByUrl('/dashboard'); }
 }

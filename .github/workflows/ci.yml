@@ -8,8 +8,8 @@ permissions:
   contents: read
 
 jobs:
-  validate:
-    name: Testes e build
+  frontend:
+    name: Frontend Angular
     runs-on: ubuntu-latest
     steps:
       - name: Obter código
@@ -20,12 +20,35 @@ jobs:
         with:
           node-version: '24'
           cache: npm
+          cache-dependency-path: frontend/package-lock.json
 
       - name: Instalar dependências
+        working-directory: frontend
         run: npm ci
 
       - name: Executar testes
+        working-directory: frontend
         run: npm test -- --watch=false
 
       - name: Gerar build de produção
+        working-directory: frontend
         run: npm run build
+
+  backend:
+    name: Backend Spring Boot
+    runs-on: ubuntu-latest
+    steps:
+      - name: Obter código
+        uses: actions/checkout@v7
+
+      - name: Configurar Java
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+          cache-dependency-path: backend/pom.xml
+
+      - name: Executar testes e gerar JAR
+        working-directory: backend
+        run: mvn --batch-mode verify
