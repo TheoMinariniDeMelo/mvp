@@ -62,6 +62,10 @@ cd backend && mvn verify
 
 O workflow de CI executa as duas validações em jobs separados a cada push e pull request.
 
+## Acessibilidade da interface
+
+O frontend oferece um atalho de teclado para pular ao conteúdo principal, indica a página atual no menu e move o foco para o título ao navegar. Formulários e controles de venda têm nomes e mensagens associados, as tabelas identificam seus cabeçalhos e as animações respeitam a preferência por movimento reduzido. O teste de navegação verifica o foco após a troca de página.
+
 ## Escopo
 
 O protótipo ainda não implementa autenticação, pagamento ou emissão fiscal. A API deve ser protegida antes de expô-la publicamente. Os dados do carrinho continuam locais a cada navegador; produtos e vendas são compartilhados no banco do backend.
