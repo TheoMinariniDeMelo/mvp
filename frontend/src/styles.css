@@ -19,3 +19,21 @@
 .stepper output{width:30px;text-align:center;color:#24364f;font-size:12px;font-weight:800}
 .stepper.small output{width:26px}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;transition-duration:.01ms!important}}
+
+/* Sale details remain readable and distinguish stock from cart quantities. */
+.product-detail strong,.product-price strong,.order-item-top strong{font-size:14px}
+.stock-text,.cart-reserved{font-size:12px;line-height:1.4}
+.cart-reserved{color:#315d9f;font-weight:700}
+.product-detail>span{flex-wrap:wrap}
+.mobile-sale-bar{display:none}
+@media(max-width:650px){
+  .sales-page{padding-bottom:175px}
+  .order-footer .confirm-button{display:none}
+  .mobile-sale-bar{position:fixed;left:0;right:0;bottom:62px;z-index:19;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px;background:#fff;border-top:1px solid #dfe6f0;box-shadow:0 -5px 18px #17243c1f;padding:12px 16px}
+  .mobile-sale-bar>div{display:flex;flex-direction:column;gap:2px}
+  .mobile-sale-bar span{font-size:11px;color:#60718a}
+  .mobile-sale-bar strong{font-size:17px;color:#1b5ed6}
+  .mobile-sale-bar .button{min-height:44px;padding:0 13px}
+  .mobile-sale-error{width:100%;color:#a52c34;font-size:12px;line-height:1.4}
+}
+@media(max-width:390px){.product-price strong{font-size:13px}}
