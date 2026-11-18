@@ -16,11 +16,15 @@ export class DashboardComponent {
   });
   readonly notice = signal('');
   readonly error = signal('');
+  readonly saving = signal(false);
   product = { name: '', category: 'Mercearia', price: null as number | null, stock: null as number | null };
   async addProduct(): Promise<void> {
+    if (this.saving()) return;
     this.error.set(''); this.notice.set('');
     if (this.product.stock === null) { this.error.set('Informe o estoque inicial do produto.'); return; }
+    this.saving.set(true);
     const error = await this.store.addProduct({ name: this.product.name, category: this.product.category, price: Number(this.product.price), stock: Number(this.product.stock) });
+    this.saving.set(false);
     if (error) { this.error.set(error); return; }
     this.notice.set('Produto cadastrado com sucesso. Ele já está disponível para venda.');
     this.product = { name: '', category: 'Mercearia', price: null, stock: null };

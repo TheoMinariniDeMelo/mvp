@@ -18,14 +18,15 @@ export class NewSaleComponent {
     return this.store.products().filter(p => [p.name, p.sku, p.category].some(value => value.toLocaleLowerCase('pt-BR').includes(term)));
   });
   quantity(id: number): number { return this.quantities()[id] ?? 1; }
+  remaining(id: number): number { return Math.max(0, this.store.available(id) - this.store.inCart(id)); }
   setQuantity(id: number, raw: string): void {
     const value = Number(raw);
     if (!Number.isInteger(value) || value < 1) { this.quantities.update(all => ({ ...all, [id]: 0 })); this.errorProductId.set(id); this.error.set('Informe uma quantidade inteira maior que zero.'); return; }
-    this.quantities.update(all => ({ ...all, [id]: value })); this.errorProductId.set(value > this.store.available(id) ? id : null); this.error.set(value > this.store.available(id) ? 'Estoque insuficiente. Verifique a quantidade selecionada.' : '');
+    this.quantities.update(all => ({ ...all, [id]: value })); this.errorProductId.set(value > this.remaining(id) ? id : null); this.error.set(value > this.remaining(id) ? 'Estoque insuficiente. Verifique a quantidade selecionada.' : '');
   }
   stepQuantity(id: number, delta: number): void {
     const next = this.quantity(id) + delta;
-    if (next >= 1 && next <= this.store.available(id)) { this.quantities.update(all => ({ ...all, [id]: next })); this.errorProductId.set(null); this.error.set(''); }
+    if (next >= 1 && next <= this.remaining(id)) { this.quantities.update(all => ({ ...all, [id]: next })); this.errorProductId.set(null); this.error.set(''); }
   }
   add(id: number): void {
     this.error.set(''); this.notice.set('');

@@ -1,6 +1,6 @@
 # Sistema Web de Gestão Comercial
 
-Monorepo do protótipo de gestão comercial. O Angular exibe o catálogo, o estoque e as vendas; a API Spring Boot valida as operações e persiste produtos, vendas e movimentações em H2. O carrinho em andamento fica no navegador até a confirmação da venda.
+Monorepo do protótipo de gestão comercial. O frontend Angular funciona sozinho em modo demonstrativo: catálogo, estoque e vendas ficam no armazenamento local do navegador. A API Spring Boot permanece no repositório para uma integração futura.
 
 ## Estrutura
 
@@ -13,14 +13,9 @@ backend/   Spring Boot 4.1, API REST, H2 e testes JUnit
 ## Requisitos e execução
 
 - Node.js 24 e npm
-- Java 21 ou superior e Maven 3.9+
+- Java 21 ou superior e Maven 3.9+ somente para executar o backend separadamente
 
-Em dois terminais, a partir da raiz:
-
-```bash
-cd backend
-mvn spring-boot:run
-```
+Para executar a versão demonstrativa, a partir da raiz:
 
 ```bash
 cd frontend
@@ -28,9 +23,20 @@ npm ci
 npm start
 ```
 
-Abra `http://localhost:4200`. O servidor de desenvolvimento Angular encaminha `/api` para `http://localhost:8080`. Em uma implantação, configure o servidor web para encaminhar esse mesmo prefixo à API.
+Abra `http://localhost:4200`. O frontend inicia com cinco produtos de exemplo e um carrinho de demonstração. Cadastro, venda e baixa de estoque funcionam sem servidor. Os dados são guardados no `localStorage` deste navegador; limpar os dados do site restaura os exemplos. A aplicação demonstrativa não compartilha dados entre usuários ou dispositivos.
 
-O banco local é criado em `backend/data/gestao-comercial.mv.db` e recebe cinco produtos de exemplo apenas quando está vazio. Para usar outra instância H2, defina `DATABASE_URL`, `DATABASE_USER` e `DATABASE_PASSWORD` antes de iniciar o backend.
+### Deploy do frontend na Vercel
+
+Importe o repositório como projeto Vercel com **Root Directory** igual a `frontend`. O arquivo `frontend/vercel.json` fixa o build Angular, a pasta de saída estática e as rotas da aplicação. Esta versão funciona sem configurar ou publicar o backend.
+
+### Backend separado
+
+```bash
+cd backend
+mvn spring-boot:run
+```
+
+O frontend demonstrativo não chama essa API. O banco local do backend é criado em `backend/data/gestao-comercial.mv.db` e recebe cinco produtos de exemplo apenas quando está vazio. Para usar outra instância H2, defina `DATABASE_URL`, `DATABASE_USER` e `DATABASE_PASSWORD` antes de iniciar o backend.
 
 ## API
 
@@ -62,6 +68,10 @@ cd backend && mvn verify
 
 O workflow de CI executa as duas validações em jobs separados a cada push e pull request.
 
+## Acessibilidade da interface
+
+O frontend oferece um atalho de teclado para pular ao conteúdo principal, indica a página atual no menu e move o foco para o título ao navegar. Formulários e controles de venda têm nomes e mensagens associados, as tabelas identificam seus cabeçalhos e as animações respeitam a preferência por movimento reduzido. O teste de navegação verifica o foco após a troca de página.
+
 ## Escopo
 
-O protótipo ainda não implementa autenticação, pagamento ou emissão fiscal. A API deve ser protegida antes de expô-la publicamente. Os dados do carrinho continuam locais a cada navegador; produtos e vendas são compartilhados no banco do backend.
+O protótipo ainda não implementa autenticação, pagamento ou emissão fiscal. Na versão demonstrativa, produtos, carrinho e vendas são locais a cada navegador; a API deve ser protegida antes de ser exposta publicamente em uma integração futura.
