@@ -30,6 +30,10 @@ npm start
 
 Abra `http://localhost:4200`. O servidor de desenvolvimento Angular encaminha `/api` para `http://localhost:8080`. Em uma implantação, configure o servidor web para encaminhar esse mesmo prefixo à API.
 
+### Deploy do frontend na Vercel
+
+Importe o repositório como projeto Vercel com **Root Directory** igual a `frontend`. O arquivo `frontend/vercel.json` fixa o build Angular, a pasta de saída estática e as rotas da aplicação. O backend Spring precisa estar publicado em uma URL HTTPS; antes de usar cadastro e vendas em produção, configure um rewrite de `/api/:path*` para `${URL_PUBLICA_DA_API}/api/:path*` na Vercel. O proxy de desenvolvimento para `localhost:8080` não é usado no deploy.
+
 O banco local é criado em `backend/data/gestao-comercial.mv.db` e recebe cinco produtos de exemplo apenas quando está vazio. Para usar outra instância H2, defina `DATABASE_URL`, `DATABASE_USER` e `DATABASE_PASSWORD` antes de iniciar o backend.
 
 ## API
